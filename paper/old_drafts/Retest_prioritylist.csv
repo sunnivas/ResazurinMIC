@@ -1,0 +1,26 @@
+ID,antibiotic,priority,strange behavior
+40_Cefixime_40strains4.txt,Cefixime,high (first test),unknown
+39_Cefixime_40strains4.txt,Cefixime,high (first test),unknown
+38_Cefixime_40strains4.txt,Cefixime,high (first test),unknown
+37_Cefixime_40strains4.txt,Cefixime,high (first test),unknown
+36_Cefixime_40strains4.txt,Cefixime,high (first test),unknown
+18_Ceftriaxone_80strains3.txt,Ceftriaxone,middle (R to S error),no
+40_Azithromycin_40strains4.txt,Azithromycin,middle (R to S error),no
+11_Ceftriaxone_40strains2.txt,Ceftriaxone,middle (high deviation),extreme double curve (3 inflection points!!) + mixed culture+ beta lactamase producer?
+11_Cefixime_40strains2.txt,Cefixime,middle (high deviation),extreme double curve (3 inflection points!!)+ mixed culture+ beta lactamase producer?
+34_Ceftriaxone_80strains5.txt,Ceftriaxone,low (high deviation),no
+34_Cefixime_80strains5.txt,Cefixime,low (high deviation),no
+34_Azithromycin_80strains5.txt,Azithromycin,low (high deviation),no
+33_Cefixime_80strains5.txt,Cefixime,low (high deviation),double curve
+33_Ceftriaxone_80strains5.txt,Ceftriaxone,low (high deviation),double curve
+25_Cefixime_80strains12.txt,Cefixime,low (high deviation),no
+17_Cefixime_40strains2.txt,Cefixime,low (high deviation),strong double curve
+14_Cefixime_40strains2.txt,Cefixime,low (high deviation),double curve
+1_Cefixime_40strains1.txt,Cefixime,low (high deviation),double curve
+31_Azithromycin_80strains4.txt,Azithromycin,low (high deviation),no 
+17_Ceftriaxone_40strains2.txt,Ceftriaxone,low (high deviation),double curve
+5_Penicillin_80strains1.txt,Penicillin,low (high deviation),beta lactamase producer?
+5_Penicillin_40strains1.txt,Penicillin,low (high deviation),beta lactamase producer?
+4_Penicillin_40strains1.txt,Penicillin,low (high deviation),beta lactamase producer?
+37_Cefixime_80strains5.txt,Cefixime,low (high deviation),no
+35_Cefixime_80strains5.txt,Cefixime,low (high deviation),weak double curve
