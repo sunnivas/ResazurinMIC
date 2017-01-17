@@ -1,0 +1,306 @@
+---
+title: "A new rapid resazurin-based microdilution assay for antimicrobial susceptibility testing of Neisseria gonorrhoeae"
+author: "Summary statistics"
+output:
+  #pdf_document:
+  #  toc: yes
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+## Introduction
+
+In this file you find summary statistics used in the paper.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 600)
+
+# Load dependencies
+## ----------------------------------------------------------------------------------------------------------------------------
+packages <- c("pander", "plyr", "gmodels", "knitr")
+to.install <- setdiff(packages, rownames(installed.packages()))
+if (length(to.install) > 0) {
+  install.packages(to.install)
+}
+lapply(packages, library, character.only = TRUE)
+
+# pandoc settings
+set.alignment(row.names = 'left', permanent = T)
+
+
+# wd, clear space
+## ----------------------------------------------------------------------------------------------------------------------------
+rm(list = ls())
+
+try(setwd('C:/Users/sunny/Dropbox/Resazurin/Pipeline_MIC_6h_github'), silent=T)
+try(setwd("C:/Users/valdes/Dropbox/Resazurin/Pipeline_MIC_6h_github"), silent=T)
+try(setwd("~/Dropbox/Resazurin/Pipeline_MIC_6h_github") , silent = T)
+
+# paths for figures to be loaded in png or pdf
+wd <- getwd()
+path_fig1 <- paste0(wd, "/output/figures/Figure1.png" )
+path_fig2 <- paste0(wd, "/output/figures/Figure2.png" )
+path_fig3 <- paste0(wd, "/output/figures/Figure3_2col.png" )
+path_figS1 <- paste0(wd, "/output/figures/FigureS1.png" )
+path_figS2 <- paste0(wd, "/output/figures/FigureS2.png" )
+path_figS3AB <- paste0(wd, "/output/figures/FigureS3AB.png" )
+path_figS4AB <- paste0(wd, "/output/figures/FigureS4AB.png" )
+
+
+# Load data
+## ----------------------------------------------------------------------------------------------------------------------------
+df <- read.csv("output/tables/training+validationdata.csv", stringsAsFactors = F)
+lm <- readRDS("output/tables/lm_parameters_variance_covariance_matrix_list.rds")
+pr <- read.csv("output/tables/categories_predicted.csv", stringsAsFactors = F)
+dev <- read.csv("output/tables/deviations.csv", stringsAsFactors = F)
+pearson <- readRDS("output/tables/pearson.rds")
+cv <- read.table("output/figures/coefficient_variation.txt")
+outlier <- read.csv("output/tables/outlier.csv")
+spanning_CI <- read.csv("output/tables/spanning_CI.csv", stringsAsFactors = F)
+#pr.f <- ddply(pr.f, ~ ID, summarize, freq = sum )
+
+```
+
+## Data description
+### Number of unique strains: `r length(unique( paste( df$strain, df$run)))`
+
+```{r , echo=F, results='asis'}
+
+cat("###", "Strain composition", "\n")
+cat("Note: reference contains 3 replicates", "\n")
+
+pandoc.table(
+  addmargins(xtabs(~run + antibiotic, df)),  split.table = Inf
+)
+
+cat("###", "EUCAST classification", "\n")
+pandoc.table(
+  addmargins(xtabs( ~ factor(EUCAST, exclude = NULL)  + antibiotic, df, exclude = NULL )),  split.table = Inf
+)
+
+# pandoc.table(
+#   round(prop.table(xtabs(~run + antibiotic, df)), digits =  2),  split.table = Inf
+# )
+
+```
+
+
+### Dose response modelling
+```{r , echo=F, results='asis'}
+pandoc.table(
+  addmargins(xtabs(~ quality + antibiotic, df)),  split.table = Inf
+)
+
+pandoc.table(
+  addmargins(xtabs(~ quality + run, df)),  split.table = Inf
+)
+# cat("### Figure1", "\n")
+
+include_graphics(path_fig1,dpi=50)
+```
+Figure 1. Potency shift of antimicrobials across different strains of N. gonorrhoeae. Dose response curves for all strains and antimicrobials are shown (except samples above limit of detection). Strains that were classified as susceptible according to EUCAST 2016 MIC breakpoints46 were coloured in green, intermediate resistant strains in blue and resistant strains in red. The gradual shift of the potencies (EC50) towards higher concentrations can be observed for all antimicrobials.
+
+
+
+## Regression analysis
+Note: esti is already in natural logs, therefore also the standard deviation
+```{r , echo=F}
+# pandoc.table(
+#   lm[[1]][[1]][[1]],  split.table = Inf
+# )
+print(lm[1])
+# summary stats of regression
+```
+
+### Pearson's correlation coefficient
+```{r,echo=F, results='asis'}
+print(pearson)
+```
+
+### Outlier
+The column "deviation" displays doubling dilutions deviation of predicted values from MIC. The column "compare" displays the EUCAST to the predicted classification.
+```{r,echo=F, results='asis'}
+outlier$X=NULL
+rownames(outlier) <- NULL
+pandoc.table(outlier,split.table = Inf)
+```
+
+```{r,echo=F, results='asis'}
+include_graphics(path_fig2,dpi=50)
+```
+Figure 2. Correlation and deviations between the Etest MICs and predicted MICs. (A) Linear regression between EC50 and Etest MIC for the training data (84 strains with blinded MICs). The Pearson's correlation coefficient for the linear regression (blue line) was 0.93 and the confidence interval highlighted in grey. Slope and intercept for a perfect correlation was drawn as dashed black line for comparison. (B) The kernel density function of the EC50 values for the training data (n=269) is shown in red (median -1.68). The kernel density of the predicted MICs for training and validation data (n=840) is shown in purple (median -0.004). (C) Deviations of predicted MICs from Etest MIC per antimicrobial (n=840). The boxplots show the median and 25%-75% quartiles. The whiskers span the range from the bottom 5% to the highest 95% of the data. The essential agreement (EA) is written below the boxplots.
+
+## Categorical agreement with Etest
+```{r , echo=F, results='asis' }
+
+
+a0 <- table( factor(pr$EUCAST, levels = c("S", "I", "R")) ,
+             factor(pr$preSIR.Etest_predicted, levels = c("S", "I", "R")))
+
+a1 <- table(  factor(pr$antibiotic),
+              factor(pr$EUCAST, levels = c("S", "I", "R")) ,
+             factor(pr$preSIR.Etest_predicted, levels = c("S", "I", "R"))
+            )
+
+a1 <- table( factor(pr$EUCAST, levels = c("S", "I", "R")) ,
+             factor(pr$preSIR.Etest_predicted, levels = c("S", "I", "R")),
+             factor(pr$antibiotic)
+            )
+
+a2 <- table( factor(pr$compare) ,
+             factor(pr$antibiotic))
+
+
+cat("### Categorical agreement, absolute and in percentage", "\n")
+cat("EUCAST as rows, predicted categories as columns", "\n")
+
+
+pandoc.table(
+  addmargins(a0),  split.table = Inf
+)
+
+pandoc.table(
+  round(addmargins(prop.table(a0)), digits = 3),  split.table = Inf
+)
+
+cat("### Categorical agreement, by antibiotics, absolute and in percentage", "\n")
+cat("EUCAST_to_predicted_categories", "\n")
+
+pandoc.table(
+  addmargins(a2),  split.table = Inf
+)
+
+pandoc.table(
+  round(addmargins(prop.table(a2)), digits = 3),  split.table = Inf
+)
+
+
+
+```
+
+```{r,echo=F, results='asis'}
+include_graphics(path_fig3,dpi=50)
+```
+
+```{r,echo=F, results='asis'}
+cat("### CI spanning over two categories", "\n")
+
+pandoc.table(
+  addmargins(xtabs(~CI_overlap + antibiotic, spanning_CI)),  split.table = Inf
+)
+
+a7 <- table(spanning_CI$CI_overlap, spanning_CI$antibiotic)
+pandoc.table(
+  round(addmargins(prop.table(a7)), digits = 3),  split.table = Inf
+)
+```
+
+## Specificity and sensitivity
+Note: I counted as R
+
+```{r , echo=F, results='asis' }
+# need to count 
+
+spec <- pr[!is.na(pr$EUCAST) & !is.na(pr$preSIR.Etest_predicted), c("EUCAST", "preSIR.Etest_predicted")]
+spec[spec=="I"] <- "R"
+#table(spec)
+
+cat("### Categorical agreement summary", "\n")
+cat("EUCAST as rows, predicted categories as columns", "\n")
+
+pandoc.table(
+  table(spec),  split.table = Inf
+)
+
+spec <- paste(spec$EUCAST, spec$preSIR.Etest_predicted, sep="_to_")
+c <- table(spec)
+
+pandoc.table(
+  c,  split.table = Inf
+)
+
+sensitivity <- c["R_to_R"] / (c["R_to_R"] + c["R_to_S"])  
+specificity <- c["S_to_S"] / (c["S_to_S"] + c["S_to_R"])  
+
+#error per antibiotic
+err <- pr[!is.na(pr$EUCAST) & !is.na(pr$preSIR.Etest_predicted), c("EUCAST", "preSIR.Etest_predicted","antibiotic")]
+err[err=="I"] <- "R"
+err$cat <- paste(err$EUCAST, err$preSIR.Etest_predicted, sep="_to_")
+err <- ddply(err,c("cat","antibiotic"),summarise,SS=sum(cat=="S_to_S"),RS=sum(cat=="R_to_S"),SR=sum(cat=="S_to_R"),RR=sum(cat=="R_to_R"))
+```
+
+Figure 3. Contingency table with categorical errors of model predicted MICs. Etest MIC data were classified into the categories resistant (R), susceptible (S) and intermediate resistant (I) according to the EUCAST 2016 criteria.46 The cutoff values (mg/L) are shown as dashed black lines. Predicted MIC values (n=868) are shown as point estimates (black dots) with 95% confidence interval (colored dashes). For some estimates no confidence interval could be calculated (limit of detection), those were drawn as triangles. Correctly classified strains are drawn in green. Minor errors resulting from misclassifications of intermediate strains are drawn in blue. Major errors (S to R) were found for ceftriaxone (n=42), cefixime (n=30), azithromycin (n=5) and tetracycline (n=2). One very major error (R to S) was found for ceftriaxone (red). A high number of estimates (n=140) has confidence intervals spanning two categories.
+
+### Sensitivity
+$\frac{R-to-R}{R-to-R + R-to-S} =$ `r round(sensitivity, digits=4)` 
+
+```{r}
+### 95% CI 
+binom.test(463, 477, p = 0.5,conf.level = 0.95)
+```
+### Specificity
+$\frac{S-to-S}{S-to-S + S-to-R} =$ `r round(specificity, digits=4)` 
+
+```{r}
+### 95% CI 
+binom.test(307, 389, p = 0.5,conf.level = 0.95)
+```
+
+## Essential agreement with Etest
+```{r,echo=F, results='asis'}
+pandoc.table(dev)
+```
+
+
+## Supplementary Material
+
+### Timecourse
+```{r,echo=F, results='asis'}
+include_graphics(path_figS1 ,dpi=50)
+```
+Figure S1. Fluorescence based time-kill curves. Logarithmized fluorescence values are plotted against the time (h). Ten different dilutions of each antimicrobial, positive control (Inf) and negative control (conc. 0) were tested on eight WHO reference panel strains. Start concentrations were calibrated to approximately 107 CFU/ml which corresponds to a log fluorescence of 6.  From 0-3 hours negative controls without antimicrobial resulted in decreased bacterial numbers, at 6 hours all samples show increased fluorescence.
+
+### Coefficient of variation
+```{r,echo=F, results='asis'}
+pandoc.table(cv)
+```
+
+```{r}
+print(summary(cv$CV))
+```
+
+```{r,echo=F, results='asis'}
+include_graphics(path_figS2,dpi=50)
+```
+Figure S2. Intra assay coefficient of variation. To test the reproducibility of the resazurin MIC assay seven antimicrobials were tested on eight WHO reference strains (n=56). The mean and standard deviation of three independent experiments was calculated. The coefficient of variation (ratio of standard deviation over the mean) was calculated for sample. Barplots are shown for each sample. The mean of the coefficient of variation (intra assay CV) is 0.29. 
+
+### Hill coefficient statistics
+```{r , echo=F, results='asis'}
+
+# summary stats of regression
+#cat("\n")
+#cat("### HILL coefficient statistics, by antibiotic", "\n")
+hill <- ddply(pr, ~ antibiotic, summarise,
+              mean=mean(Hill, na.rm = T),
+              sd=sd(Hill, na.rm = T),
+              min=min(Hill, na.rm = T),
+              max=max(Hill, na.rm = T)
+              )
+hill <- hill[order(hill$mean), ]
+pandoc.table(
+  hill,  split.table = Inf
+)
+
+```
+
+```{r,echo=F, results='asis'}
+include_graphics(path_figS3AB, dpi=50)
+```
+Figure S3. Difference of Hill coefficients.  (a) The difference between the mean of 124 Hill coefficients (124 clinical strains examined) is shown for each antimicrobial combination. High values are shown in an increasingly intense blue colour gradient and low values in red. A pairwise t-test was performed and non-significant differences (p value > 0.05) marked with a black cross. (b) Hierarchical clustering of Hill coefficients. Rows represent Hill coefficients for different strains (N=124) and columns antimicrobials. The beta-lactams penicillin G, ceftriaxone and cefixime are more similar to each other than to the other antimicrobials.
+
+### Example for Biphasic curves
+```{r,echo=F, results='asis'}
+include_graphics(path_figS4AB, dpi=50)
+```
+Figure S4. Biphasic dose response curves.  The viability (%) was plotted against 24 different antimicrobial concentrations. Mean and standard error of three independent experiments are shown. (a) Ceftriaxone in Strain 11 (validation data). A biphasic model (red curve) fits the model better (bic=563) than a monophasic model (bic=794).1 The first EC50 is at 0.12 mg/L and the second at 1.21 mg/L (Etest MIC=0.125 mg/L).   (b) Cefixime in Strain 11 (validation data). A biphasic model (red curve) fits the model better (bic=850) than a monophasic model (bic=8574). The first EC50 is at 0.16 mg/L and the second at 1.39 mg/L (Etest MIC=0.25 mg/L). 
