@@ -49,6 +49,7 @@ bestEC$correct <- grepl("^S_to_S$|^R_to_R$|^I_to_I$", bestEC$compare ) * 1
 
 table(bestEC$CI_overlap, bestEC$correct)
 summary(bestEC$CI_overlap)
+write.csv(bestEC[, c("CI_overlap", "run", "antibiotic")], "output/tables/spanning_CI.csv", row.names = F )
 
 # create cutoffs
 #----------------------------------------------------------------------------------------------
@@ -75,7 +76,6 @@ bestEC$overlap.lower <- ifelse(bestEC$CI_low >= bestEC$Etest.low , T, F)
 bestEC$overlap.upper <- ifelse(bestEC$CI_up <= bestEC$Etest.high , T, F)
 bestEC$Etest_in_prediction_CI <- ifelse(bestEC$MIC >= bestEC$CI_low &
                                         bestEC$MIC <= bestEC$CI_up, T, F)
-
 
 # just take relevant information, so that it s easier to verify
 # df <- bestEC[c("ETest_predicted","antibiotic", "Etest", "deviation","EC50")]
@@ -111,8 +111,8 @@ dev_Exp <- dev + theme_bw(base_size = 18)+
         legend.title = element_blank(),
         axis.line = element_line(colour = "black"),
         legend.key = element_rect(colour = "white"))+
-  geom_vline(xintercept = -0.003827,colour="red",linetype = 3, size=1)+
-  geom_vline(xintercept = -1.6781,colour="red", linetype = 3,size=1 ) +
+  geom_vline(xintercept = -0.01459 ,colour="red",linetype = 3, size=1)+
+  geom_vline(xintercept = -1.678,colour="red", linetype = 3,size=1 ) +
   guides(colour = guide_legend(override.aes = list(size=8)))
 
 saveRDS(list("Density" = dev_Exp), "output/figures/Density_plot.RDS")
