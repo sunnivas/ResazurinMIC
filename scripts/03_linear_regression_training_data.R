@@ -3,12 +3,11 @@
 ## ----------------------------------------------------------------------------------------------------------------------------
 # In this file we fit a linear regression to the training data and plot the model
 
-
 # Load dependencies and set options
 ## ----------------------------------------------------------------------------------------------------------------------------
 rm(list=ls())
 
-packages <- c("ggplot2")
+packages <- c("ggplot2", "RColorBrewer")
 to.install <- setdiff(packages, rownames(installed.packages()))
 if (length(to.install) > 0) {
   install.packages(to.install)
@@ -72,31 +71,34 @@ options(scipen = 100)
 fmt_dcimals <- function(decimals=0){
   function(x) as.character(round(x,decimals))
 }
+# colorvector <- c( "#D95F02", "#7570B3", "#E7298A" ,"#66A61E", "#1F78B4", "#A6761D", "#666666")
+colorvector <- brewer.pal(9,"Set1")[c(3,2,1,4,5,9,8)]
+#colorvector <- brewer.pal(8,"Set2")
 
 dfplot <- df4
-dfplot$antibiotic <- gsub("Penicillin","Penicillin G", dfplot$antibiotic ) # cosmetic changes
+dfplot$antibiotic <- gsub("Penicillin","Penicillin", dfplot$antibiotic ) # cosmetic changes
 
 p1<-ggplot(dfplot, aes (x = exp(Estimate), y = as.numeric(MIC))) +
-  geom_text(data = data.frame(), aes(0.05, 0.0005, label = ""),cex=16, fontface="bold")+
-  geom_point(size=2,alpha=0.6,aes(colour = factor(antibiotic)))+labs(aes(colour=antibiotic))+
-  geom_smooth(method = "lm",color="steelblue2",show.legend = F,se = T,level=0.95)+
+  #geom_text(data = data.frame(), aes(0.05, 0.0005, label = ""),cex=16, fontface="bold")+
+  geom_point(size=2,alpha=0.6,aes(colour = factor(antibiotic)))+ #labs(aes(colour=antibiotic))+
+  geom_smooth(method = "lm",color="steelblue2",show.legend = F,se = F,level=0.95)+
   scale_y_continuous("Etest MIC (mg/L)",trans='log10' , limits = c(0.00001, 5000),
                      breaks=c(0.00001,0.0001,0.001, 0.01,0.1,1,10,100,1000), labels = fmt_dcimals(5))+
   scale_x_continuous(expression("EC"[50]*" (mg/L)"), trans='log10' , limits = c(0.00001, 5000),
-                     breaks=c(0.00001,0.0001,0.001, 0.01,0.1,1,10,100,1000), labels = fmt_dcimals(5))
-  
-q <- p1 + geom_abline(intercept = 0.0000001, slope = 1, color="black", lty=2)+
+                     breaks=c(0.00001,0.0001,0.001, 0.01,0.1,1,10,100,1000), labels = fmt_dcimals(5)) +
+  scale_color_manual(values=colorvector) + geom_abline(intercept = 0.0000001, slope = 1, color="black", lty=2)+
   theme_bw(18)+theme(legend.justification=c(-0.01,1.01),
                    legend.position=c(0,1),
                    legend.text = element_text(colour="black"),
-                   #legend.title = element_text(colour="black", face="bold", size = 22),
                    legend.title = element_blank(),
                    axis.line = element_line(colour = "black"),
                    legend.key = element_rect(colour = "white")) +
-                   guides(colour = guide_legend(override.aes = list(size=8)))
-q
-regr_plot <- list("regression" = q)
+                   guides(colour = guide_legend(override.aes = list(size=8))) 
+p1
+
+regr_plot <- list("regression" = p1)
 saveRDS(regr_plot, "output/figures/regression_plot.RDS")
+
 
 # file end
 ## -----------------------------------------------------------------------------------------------------------

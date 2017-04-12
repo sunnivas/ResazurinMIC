@@ -24,7 +24,7 @@ fmt_dcimals <- function(decimals=0){
 # Load data
 ## ----------------------------------------------------------------------------------------------------------------------------
 
-df <- read.csv("output/tables/categories_predicted_training.csv", stringsAsFactors = F)
+df <- read.csv("output/tables/categories_predicted.csv", stringsAsFactors = F)
 m2 <- readRDS("output/tables/training_data_normalized_model_list.rds")
 m3 <- readRDS("output/tables/validation_data_normalized_model_list.rds")
 m <- c(m2, m3)
@@ -75,15 +75,14 @@ dp <- transform(dp,
 colori <- brewer.pal(4, "Set1")[c(3,2,1,4)]
 # names(dp) <- c("ID","conc","predi","EUCAST","antibiotic","run","EUCAST category","strain")
 
-ggplot(dp, aes(x = conc, y = predi, colour = preSIR.Etest_predicted, group = ID)) + theme_bw(base_size = 10) +
-  geom_line()  + scale_x_log10("Concentration (mg/L)", labels = fmt_dcimals(5)) + scale_y_continuous("Viability (in %)") +
+p=ggplot(dp, aes(x = conc, y = predi, colour = preSIR.Etest_predicted, group = ID)) + theme_bw(base_size = 10) +
+  geom_line()  + scale_x_log10("Concentration (mg/L)", labels = fmt_dcimals(5)) + scale_y_continuous("Viability (in %)")+
   facet_wrap(~ antibiotic, ncol = 2, scales = "free" ) +
   scale_color_manual(values=colori) +
   theme( strip.background = element_rect(fill = "snow2"), # this is the box with I,S,R
          legend.position="top",
          plot.margin = unit(c(0.5,0.5,1.0,1.0), "cm")) 
-
-
+p$labels$colour <- "EUCAST Categories"
+p
 ggsave(file="output/figures/Figure1.pdf", width =20, height = 25, units = "cm")
-
-
+ggsave(file="output/figures/Figure1.png", width =20, height = 25, units = "cm")

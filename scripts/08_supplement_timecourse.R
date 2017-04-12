@@ -1,8 +1,8 @@
 
 rm(list=ls())
-require("XLConnect")
-require("ggplot2")
-require("reshape")
+library("XLConnect")
+library("ggplot2")
+library("reshape")
 
 #--------------------------------------------------------------------- Load data and merge it together
 fl <- list.files("data/timecourse_data/")
@@ -30,7 +30,7 @@ df$strain[grepl("FluorometricO",df$strain)] <- "WHO O"
 df$strain[grepl("FluorometricP",df$strain)] <- "WHO P"
 
 anti <- c("Spectinomycin","^H$",
-          "Penicillin G","^G$",
+          "Penicillin","^G$",
           "Tetracycline","^F$",
           "Cefixime","^E$",
           "Ceftriaxone","^D$",
@@ -50,12 +50,15 @@ df1 <- melt.data.frame(df, id=names(df)[!grepl("X", names(df))])
 df2 <- melt(df1)
 df2$time <- as.numeric(df2$time)
 names(df2) <- c("antimicrobial","time","strain","conc.","fluorescence")
-ggplot(data=df2, aes(x=time, y=log(fluorescence), group=conc., colour=conc.)) +
+p <- ggplot(data=df2, aes(x=time, y=log(fluorescence), group=conc., colour=conc.)) +
   facet_grid(antimicrobial~strain) +
   scale_x_continuous(breaks=c(0,3,6,9,12,15), lim=c(0,16)) +
+  scale_y_continuous("log fluorescence")+
   geom_line() +
-  geom_point() + theme_bw()
-ggsave(file="output/figures/FigureS1.pdf", width =30, height = 20, units = "cm")
+  geom_point() + theme_bw()+theme(legend.position="top")
+p+guides(colour = guide_legend(nrow = 1))
+ggsave(file="output/figures/FigureS1.pdf", width =23, height = 19.2, units = "cm")
+ggsave(file="output/figures/FigureS1.png", width =23, height = 19.2, units = "cm")
 #---------------------------------------------------------------------
 
 

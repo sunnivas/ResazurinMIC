@@ -36,6 +36,7 @@ su2 <- ddply(su1, ~antibiotic , summarise, count=length(antibiotic))
 # Note that we have the same regression parameters for all observations.
 ## ----------------------------------------------------------------------------------------------------------------------------
 size <- 1e5 # size of the random samples for bootstrapping
+set.seed(1234)
 
 # First we get the antibiotic specific parameters (parameters are no antibiotic specific anymore, as there is no max correlation anymore)
 coefficients <- coef(parameters[[1]]$Estimates)

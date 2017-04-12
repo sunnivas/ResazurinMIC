@@ -286,6 +286,9 @@ panel <- grid.arrange(arrangeGrob(
 
 title_out <- paste0("output/figures/Figure3",output.ext, ".pdf")
 ggsave(file=title_out, panel, width =35, height = 20, units = "cm")
+title_outp <- paste0("output/figures/Figure3",output.ext, ".png")
+ggsave(file=title_outp, panel, width =35, height = 20, units = "cm")
+
 
 panel <- grid.arrange(arrangeGrob(
   Azithromycin,
@@ -299,9 +302,10 @@ panel <- grid.arrange(arrangeGrob(
   bottom = textGrob("Model classification", vjust = 0.3),
   left = textGrob("EUCAST classification", rot = 90, vjust = 1)))
 
-title_out <- paste0("output/figures/Figure3_2col",output.ext, ".png")
+# title_out <- paste0("output/figures/Figure3_2col",output.ext, ".png")
+# ggsave(file=title_out, panel, width =30, height = 60, units = "cm")
+title_out <- paste0("output/figures/Figure3_2col",output.ext, ".pdf")
 ggsave(file=title_out, panel, width =30, height = 60, units = "cm")
-
 # we also want to save the data, will be used in script 9
 ## ----------------------------------------------------------------------------------------------------------------------------
 

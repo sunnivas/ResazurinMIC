@@ -148,7 +148,7 @@ pdf("output/figures/FigureS3B.pdf")
 aheatmap(Hill.m)
 dev.off()
 
-# try to plot both
+# try to plot both pdf
 ## -----------------------------------------------------------------------------------------------------------
 #par(mfrow=c(1,2))
 pdf("output/figures/FigureS3AB.pdf", width = 20, height = 10)
@@ -157,7 +157,19 @@ layout(matrix(c(1,2), 1, 2, byrow = TRUE),
        widths=c(4.5,3))
 corrplot(d.m.diff,is.corr = FALSE, method = "number",type="lower",p.mat = d.m.pmatrix, sig.level = 0.05,
          rect.col = "black",tl.col = "black",cl.lim=c(-2,2),cl.cex=1.5,number.cex = 1.6)
-aheatmap(Hill.m,labRow=NA)
+aheatmap(Hill.m,labRow=NA, hclustfun = "complete")
+dev.off()
+# png
+## -----------------------------------------------------------------------------------------------------------
+#par(mfrow=c(1,2))
+png("output/figures/FigureS3AB.png",width = 960, height = 480, units = "px") 
+
+#par(mfrow=c(1,2))
+layout(matrix(c(1,2), 1, 2, byrow = TRUE),
+       widths=c(4.5,3))
+corrplot(d.m.diff,is.corr = FALSE, method = "number",type="lower",p.mat = d.m.pmatrix, sig.level = 0.05,
+         rect.col = "black",tl.col = "black",cl.lim=c(-2,2),cl.cex=1.5,number.cex = 1.6)
+aheatmap(Hill.m,labRow=NA, hclustfun = "complete")
 dev.off()
 
 # file end

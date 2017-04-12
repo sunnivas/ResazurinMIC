@@ -25,7 +25,8 @@ write.table(df1,file="output/figures/coefficient_variation.txt")
 ##antiMIC2robial after CV
 p=ggplot(df1, aes(antibiotic, CV)) +
   geom_bar(stat="identity", aes(fill=factor(antibiotic))) + facet_wrap(~strain,ncol=4) + labs(x = "", y = "CV (%)") +
-  theme_bw(base_size = 14)+theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank()) 
-p+ guides(fill=guide_legend(title="Antimicrobial"))
+  theme_bw(base_size = 14)+theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank(),legend.position="top",legend.key.size = unit(1, "cm"),legend.text=element_text(size=20)) 
+# q=p+ guides(fill=guide_legend(title=""))
+p+guides(fill=guide_legend(nrow=1,byrow=TRUE,title=""))
 ggsave("output/figures/FigureS2.pdf",width=15,height=10)
-
+ggsave("output/figures/FigureS2.png",width=15,height=10)
